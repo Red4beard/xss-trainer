@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XSS Checklist — Interactive Trainer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg: #07090d;
+  --bg2: #0d1017;
+  --surface: #111520;
+  --surface2: #161b28;
+  --border: #1c2333;
+  --border2: #232d42;
+  --accent: #4af0a0;
+  --accent-dim: rgba(74,240,160,0.08);
+  --warn: #f0a04a;
+  --warn-dim: rgba(240,160,74,0.08);
+  --danger: #f04a6a;
+  --danger-dim: rgba(240,74,106,0.08);
+  --blue: #4a9ef0;
+  --blue-dim: rgba(74,158,240,0.08);
+  --text: #b8c8e0;
+  --text2: #6a7a90;
+  --text3: #3a4558;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+  );
+}
+
+/* ── Layout ── */
+.app { position: relative; z-index: 1; display: flex; min-height: 100vh; }
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 280px; flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  position: sticky; top: 0; height: 100vh;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); }
+
+.sidebar-header { padding: 28px 20px 20px; border-bottom: 1px solid var(--border); }
+.logo-big { font-family: var(--display); font-size: 36px; letter-spacing: 2px; color: #fff; line-height: 1; }
+.logo-big span { color: var(--accent); }
+.logo-sub { font-family: var(--mono); font-size: 10px; color: var(--text2); margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* Progress ring */
+.progress-wrap {
+  padding: 20px; display: flex; align-items: center; gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.ring-container { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
+.ring-svg { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--border2); stroke-width: 3; }
+.ring-fill {
+  fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round;
+  stroke-dasharray: 138.2; stroke-dashoffset: 138.2;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.ring-label {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--accent);
+}
+
+.progress-pct { font-family: var(--display); font-size: 28px; color: var(--accent); line-height: 1; }
+.progress-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* Nav */
+.nav { padding: 10px 0; flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 20px; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-left: 2px solid transparent;
+  font-size: 12px; color: var(--text2); font-family: var(--mono);
+}
+.nav-item:hover { background: var(--surface); color: var(--text); }
+.nav-item.done { color: var(--accent); opacity: 0.7; border-left-color: transparent; }
+.nav-num { font-size: 10px; width: 18px; text-align: right; flex-shrink: 0; opacity: 0.5; }
+.nav-check {
+  width: 14px; height: 14px; border: 1px solid currentColor; border-radius: 2px;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+}
+.nav-item.done .nav-check { background: var(--accent); border-color: var(--accent); color: #000; }
+.nav-title { flex: 1; }
+
+.sidebar-footer {
+  padding: 16px 20px; border-top: 1px solid var(--border);
+  font-size: 10px; color: var(--text3); font-family: var(--mono);
+}
+
+/* ── Main ── */
+.main { flex: 1; padding: 40px 48px 80px; max-width: 860px; }
+
+/* Chain banner */
+.chain-banner {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--blue);
+  padding: 14px 18px; margin-bottom: 36px;
+  font-family: var(--mono); font-size: 12px; color: var(--text2);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.chain-banner .chain-item { color: var(--blue); }
+.chain-banner .chain-arr { color: var(--text3); }
+
+/* Step card */
+.step-card {
+  margin-bottom: 24px; border: 1px solid var(--border);
+  background: var(--surface); position: relative;
+  transition: border-color 0.2s; scroll-margin-top: 20px;
+}
+.step-card.done-card { border-color: rgba(74,240,160,0.2); }
+.step-card.done-card .step-header { background: rgba(74,240,160,0.03); }
+.step-card:hover { border-color: var(--border2); }
+
+.step-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none; transition: background 0.15s;
+}
+.step-header:hover { background: var(--surface2); }
+
+.step-num-badge { font-family: var(--display); font-size: 22px; color: var(--text3); width: 36px; flex-shrink: 0; line-height: 1; }
+.done-card .step-num-badge { color: var(--accent); }
+
+.step-title-group { flex: 1; }
+.step-title { font-weight: 600; font-size: 14px; color: var(--text); font-family: var(--mono); }
+.step-subtitle { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+.step-type-tag { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border: 1px solid; font-weight: 500; flex-shrink: 0; }
+.tag-reflected { color: var(--blue); border-color: rgba(74,158,240,0.3); background: var(--blue-dim); }
+.tag-stored { color: var(--warn); border-color: rgba(240,160,74,0.3); background: var(--warn-dim); }
+.tag-dom { color: var(--accent); border-color: rgba(74,240,160,0.3); background: var(--accent-dim); }
+.tag-setup { color: var(--text2); border-color: var(--border2); background: var(--surface2); }
+.tag-defense { color: var(--danger); border-color: rgba(240,74,106,0.3); background: var(--danger-dim); }
+
+.step-chevron { font-size: 11px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
+.step-card.open .step-chevron { transform: rotate(90deg); }
+
+/* Step body */
+.step-body { display: none; }
+.step-card.open .step-body { display: block; }
+
+.step-section { padding: 18px 20px; border-bottom: 1px solid var(--border); }
+.step-section:last-child { border-bottom: none; }
+
+.section-label {
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text3); margin-bottom: 10px;
+}
+
+/* Code block */
+.code-block {
+  background: #080b10; border: 1px solid var(--border);
+  padding: 12px 14px 12px 14px;
+  font-family: var(--mono); font-size: 12px; color: #c0d8f0;
+  position: relative; overflow-x: auto; line-height: 1.7; white-space: pre;
+}
+.code-block .kw { color: #f07070; }
+.code-block .fn { color: #70c0f0; }
+.code-block .str { color: var(--accent); }
+.code-block .cm { color: var(--text3); font-style: italic; }
+
+.copy-btn {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text2); font-family: var(--mono); font-size: 10px;
+  padding: 3px 8px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+code {
+  font-family: var(--mono); font-size: 12px;
+  background: var(--surface2); color: var(--blue);
+  padding: 1px 5px; border: 1px solid var(--border);
+}
+
+/* Table */
+.result-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--mono); }
+.result-table th {
+  background: var(--surface2); padding: 8px 12px; text-align: left;
+  font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text2); border: 1px solid var(--border);
+}
+.result-table td { padding: 8px 12px; border: 1px solid var(--border); color: var(--text); vertical-align: top; }
+.result-table tr:hover td { background: var(--surface2); }
+.td-ok { color: var(--accent); }
+.td-ok::before { content: 'OK '; }
+.td-danger { color: var(--danger); }
+.td-danger::before { content: '! '; }
+
+/* Checklist */
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.check-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s; user-select: none;
+}
+.check-item:hover { border-color: var(--border2); }
+.check-item.checked { border-color: rgba(74,240,160,0.25); background: rgba(74,240,160,0.04); }
+.check-item.warn-check { border-left: 2px solid var(--warn); }
+.check-item.warn-check.checked { border-left-color: var(--accent); }
+
+.check-box {
+  width: 16px; height: 16px; border: 1.5px solid var(--border2); border-radius: 3px;
+  flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; transition: all 0.15s; background: var(--surface);
+}
+.check-item.checked .check-box { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+
+.check-text { font-size: 13px; line-height: 1.5; flex: 1; color: var(--text); }
+.check-item.checked .check-text { color: var(--text2); text-decoration: line-through; text-decoration-color: var(--text3); }
+
+.check-badge {
+  font-family: var(--mono); font-size: 9px; padding: 1px 6px;
+  background: var(--danger-dim); border: 1px solid rgba(240,74,106,0.2);
+  color: var(--danger); flex-shrink: 0; margin-top: 2px; align-self: flex-start;
+}
+
+/* Callout */
+.callout {
+  padding: 12px 14px; border-left: 2px solid;
+  font-size: 12px; line-height: 1.7; font-family: var(--mono); margin-bottom: 12px;
+}
+.callout-blue { border-color: var(--blue); background: var(--blue-dim); color: var(--text2); }
+.callout-warn { border-color: var(--warn); background: var(--warn-dim); color: var(--warn); }
+.callout-danger { border-color: var(--danger); background: var(--danger-dim); color: var(--danger); }
+.callout-green { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+
+/* Complete button */
+.complete-btn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 12px 20px; background: transparent; border: none;
+  border-top: 1px solid var(--border); cursor: pointer;
+  font-family: var(--mono); font-size: 11px; color: var(--text2);
+  transition: background 0.15s, color 0.15s; text-align: left;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.complete-btn:hover { background: var(--accent-dim); color: var(--accent); }
+.complete-btn.is-done { background: var(--accent-dim); color: var(--accent); }
+.complete-btn .btn-icon { font-size: 13px; }
+
+/* Report card */
+.report-card { background: var(--surface); border: 1px solid var(--border); padding: 28px; margin-top: 16px; }
+.report-title { font-family: var(--display); font-size: 28px; letter-spacing: 2px; color: var(--text); margin-bottom: 20px; }
+
+.coverage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin: 20px 0; }
+.cov-cell { background: var(--surface); padding: 14px; text-align: center; }
+.cov-num { font-family: var(--display); font-size: 32px; color: var(--accent); line-height: 1; }
+.cov-label { font-family: var(--mono); font-size: 10px; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+.where-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.where-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 12px; font-family: var(--mono); color: var(--text2);
+}
+.where-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--warn); flex-shrink: 0; }
+
+.reset-btn {
+  font-family: var(--mono); font-size: 11px; padding: 8px 16px;
+  background: transparent; border: 1px solid var(--border2); color: var(--text2);
+  cursor: pointer; transition: all 0.15s; text-transform: uppercase; letter-spacing: 1px;
+}
+.reset-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); }
+
+/* Highlight animation */
+@keyframes highlightPulse {
+  0% { border-color: var(--accent); }
+  100% { border-color: var(--border); }
+}
+.step-card.highlight { animation: highlightPulse 1s ease forwards; }
+
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { padding: 24px 20px 60px; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-big">XSS<span>.</span></div>
+    <div class="logo-sub">Security Checklist Trainer</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="ring-container">
+      <svg class="ring-svg" width="52" height="52" viewBox="0 0 52 52">
+        <circle class="ring-bg" cx="26" cy="26" r="22"/>
+        <circle class="ring-fill" id="ringFill" cx="26" cy="26" r="22"/>
+      </svg>
+      <div class="ring-label" id="ringLabel">0</div>
+    </div>
+    <div class="progress-info">
+      <div class="progress-pct" id="progressPct">0%</div>
+      <div class="progress-desc" id="progressDesc">steps done: 0 / 13</div>
+    </div>
+  </div>
+
+  <nav class="nav" id="sideNav"></nav>
+
+  <div class="sidebar-footer">
+    <button class="reset-btn" onclick="resetAll()">reset progress</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main" id="mainContent">
+
+  <div class="chain-banner">
+    <span style="font-size:11px;color:var(--text3);">ATTACK CHAIN</span>
+    <span class="chain-item">Source</span>
+    <span class="chain-arr">→</span>
+    <span class="chain-item">Transport</span>
+    <span class="chain-arr">→</span>
+    <span class="chain-item">Storage</span>
+    <span class="chain-arr">→</span>
+    <span class="chain-item">Render</span>
+    <span class="chain-arr">→</span>
+    <span class="chain-item">Execution</span>
+    <span style="margin-left:auto;font-size:11px;color:var(--text3);">Break any link = no XSS</span>
+  </div>
+
+  <div id="stepsContainer"></div>
+
+</main>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// CODE SNIPPETS REGISTRY
+// All multi-line or special-character code lives here.
+// Buttons reference them by key — avoids JSON.stringify escaping bugs.
+// ─────────────────────────────────────────────
+const CODES = {
+  probe_url:        'https://site.com/page?test=XSS_PROBE_2026_A1',
+  probe_check:      'document.body.innerHTML.includes("XSS_PROBE_2026_A1")',
+  chars_expected:   '&lt;  &gt;  &quot;  &#39;  &amp;',
+  attr_break:       'ATTR_TEST_2026 " test=\'x',
+  dom_hook:
+`(function() {
+  const original = Object.getOwnPropertyDescriptor(
+    Element.prototype, 'innerHTML'
+  );
+  Object.defineProperty(Element.prototype, 'innerHTML', {
+    set: function(value) {
+      if (value && value.includes("XSS")) {
+        console.log("!! USER DATA INTO innerHTML ->", value);
+        debugger;
+      }
+      return original.set.call(this, value);
+    }
+  });
+})();`,
+  dom_marker:       'XSS_DOM_PROBE_2026',
+  adj_hook:
+`const _origAdj = Element.prototype.insertAdjacentHTML;
+Element.prototype.insertAdjacentHTML = function(pos, html) {
+  if (html.includes("XSS")) {
+    console.log("!! insertAdjacentHTML sink ->", html);
+    debugger;
+  }
+  return _origAdj.call(this, pos, html);
+};`,
+  url_check:
+`window.location.search
+window.location.hash`,
+  url_hash:         'https://site.com/page#XSS_HASH_2026',
+  url_hash_check:   'document.body.innerHTML.includes("XSS_HASH_2026")',
+  ls_keys:          'Object.keys(localStorage)',
+  ls_inject:
+`localStorage.setItem("XSS_TEST_KEY", "<div>XSS_LS_PROBE</div>");
+location.reload();`,
+  ls_check:         'document.body.innerHTML.includes("XSS_LS_PROBE")',
+  stored_check:     'document.body.innerHTML.includes("STORED_XSS_PROBE_2026")',
+  json_response:    '{ "content": "<div>STORED_XSS_PROBE_2026</div>" }',
+  cookie_payload:   'XSS_COOKIE_TEST=<div>XSS_COOKIE_2026</div>',
+  cookie_check:     'document.body.innerHTML.includes("XSS_COOKIE_2026")',
+  dangerous_patterns:
+`innerHTML
+insertAdjacentHTML
+dangerouslySetInnerHTML   // React
+v-html                    // Vue
+document.write
+eval(
+setTimeout(               // with string, not function
+location.href =`,
+  final_payload:
+`// Final test — reveals execution context
+alert(document.domain)
+console.log("XSS:", document.domain, document.cookie)`,
+};
+
+// ─────────────────────────────────────────────
+// STEP DATA
+// ─────────────────────────────────────────────
+const STEPS = [
+  {
+    id: 0, num: '00',
+    title: 'Environment Setup',
+    subtitle: 'Prepare DevTools before testing',
+    type: 'setup', typeLabel: 'Setup',
+    sections: [
+      {
+        label: 'Required actions',
+        checks: [
+          { text: 'Open target page in <code>Incognito</code> mode' },
+          { text: 'DevTools → <code>Network</code> → enable <code>Preserve log</code>' },
+          { text: 'DevTools → <code>Console</code> → clear all messages' },
+          { text: 'DevTools → <code>Network</code> → enable <code>Disable cache</code>' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 1, num: '01',
+    title: 'Reflection Marker Test',
+    subtitle: 'Does the input come back in the response?',
+    type: 'reflected', typeLabel: 'Reflected',
+    sections: [
+      { label: 'Input marker (paste into field or URL param)', codeKey: 'probe_url', codeLang: 'plain',
+        codeDisplay: 'XSS_PROBE_2026_A1' },
+      { label: 'Test via URL parameter', codeKey: 'probe_url', codeLang: 'plain' },
+      { label: 'Check in Console', codeKey: 'probe_check', codeLang: 'js' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Type <code>XSS_PROBE_2026_A1</code> into the target input field' },
+          { text: 'Run the Console check above — note the result (<code>true</code> / <code>false</code>)' },
+          { text: 'In <code>Elements</code> (Ctrl+F) search for <code>XSS_PROBE_2026_A1</code>' },
+        ]
+      },
+      {
+        label: 'Interpreting the result',
+        table: {
+          headers: ['Result', 'Meaning'],
+          rows: [
+            ['Not found', { text: 'Not reflected — XSS not possible here', cls: 'td-ok' }],
+            ['Found as plain text', { text: 'Reflected safely — encoded', cls: 'td-ok' }],
+            ['Found inside HTML markup', { text: 'Potential XSS injection point', cls: 'td-danger' }],
+          ]
+        }
+      }
+    ]
+  },
+  {
+    id: 2, num: '02',
+    title: 'Escaping Check',
+    subtitle: 'Do special characters pass through unescaped?',
+    type: 'reflected', typeLabel: 'Reflected',
+    sections: [
+      { label: 'Input to submit', codeKey: null, codeLang: 'plain',
+        rawCode: 'XSS_CHARS < > " \' & / =' },
+      { label: 'Expected output in Elements (must be HTML entities)', codeKey: 'chars_expected', codeLang: 'plain' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Submit the input above, then open <code>Elements</code>' },
+          { text: 'Find the value in DOM and verify it shows HTML entities' },
+          { text: 'If you see raw <code>&lt; &gt; " \'</code> unescaped inside HTML markup — <strong style="color:var(--danger)">DANGEROUS</strong>', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 3, num: '03',
+    title: 'Attribute Break-out Test',
+    subtitle: 'Can a quote character escape an HTML attribute?',
+    type: 'reflected', typeLabel: 'Reflected',
+    sections: [
+      { label: 'Input to submit', codeKey: 'attr_break', codeLang: 'plain' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Submit the payload, then open <code>Elements</code>' },
+          { text: 'Verify no new attributes appeared on the target element' },
+          { text: 'Verify the DOM structure is intact — no broken tags' },
+          { text: 'Verify the quote stayed inside the <code>value</code> attribute' },
+          { text: 'If the quote escaped the attribute boundary — <strong style="color:var(--danger)">attribute injection possible</strong>', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 4, num: '04',
+    title: 'DOM Sink Diagnosis',
+    subtitle: 'Hook innerHTML to catch user data flowing into it',
+    type: 'dom', typeLabel: 'DOM-based',
+    sections: [
+      { label: 'Paste into Console BEFORE submitting input', codeKey: 'dom_hook', codeLang: 'js' },
+      { label: 'Then submit this marker in the target field', codeKey: 'dom_marker', codeLang: 'plain' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Paste the hook snippet into Console and press Enter' },
+          { text: 'Type the marker <code>XSS_DOM_PROBE_2026</code> into the input' },
+          { text: '<code>debugger</code> fired and <code>value</code> contains the marker — <strong style="color:var(--danger)">real DOM-XSS risk</strong>', warn: true },
+          { text: '<code>innerHTML</code> called but no marker — safe framework usage, not dangerous' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 5, num: '05',
+    title: 'insertAdjacentHTML Sink',
+    subtitle: 'Check the second most common dangerous method',
+    type: 'dom', typeLabel: 'DOM-based',
+    sections: [
+      { label: 'Paste into Console', codeKey: 'adj_hook', codeLang: 'js' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Paste the hook snippet into Console and press Enter' },
+          { text: 'Re-submit the marker <code>XSS_DOM_PROBE_2026</code>' },
+          { text: '<code>debugger</code> fired — user data flows into <code>insertAdjacentHTML</code>', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 6, num: '06',
+    title: 'URL / location as Source',
+    subtitle: 'Hash and search params flowing into DOM',
+    type: 'dom', typeLabel: 'DOM-based',
+    sections: [
+      { label: 'Inspect location in Console', codeKey: 'url_check', codeLang: 'js' },
+      { label: 'Test URL with hash payload', codeKey: 'url_hash', codeLang: 'plain' },
+      { label: 'After navigating — check DOM', codeKey: 'url_hash_check', codeLang: 'js' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Run <code>window.location.search</code> and <code>window.location.hash</code> in Console — note values' },
+          { text: 'Navigate to the test URL with <code>#XSS_HASH_2026</code>' },
+          { text: 'Run the DOM check in Console' },
+          { text: 'Result <code>true</code> — hash reaches DOM, investigate the sink', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 7, num: '07',
+    title: 'localStorage as Source',
+    subtitle: 'Stored client data rendering into DOM',
+    type: 'dom', typeLabel: 'DOM-based',
+    sections: [
+      { label: 'Inspect storage contents', codeKey: 'ls_keys', codeLang: 'js' },
+      { label: 'Inject test value and reload', codeKey: 'ls_inject', codeLang: 'js' },
+      { label: 'After reload — check DOM', codeKey: 'ls_check', codeLang: 'js' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Run <code>Object.keys(localStorage)</code> — are there large JSON objects?' },
+          { text: 'Run the inject snippet to write a test value' },
+          { text: 'Wait for page reload' },
+          { text: 'Run the DOM check — marker found in HTML', warn: true },
+          { text: 'If found — activate the <code>innerHTML hook</code> from Step 04 to locate the exact sink', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 8, num: '08',
+    title: 'Stored XSS via Network',
+    subtitle: 'Data persists server-side and renders for other users',
+    type: 'stored', typeLabel: 'Stored',
+    sections: [
+      { label: 'Input to save (use in a form field — comment, name, bio...)',
+        codeKey: null, rawCode: 'STORED_XSS_PROBE_2026', codeLang: 'plain' },
+      { label: 'After page reload — verify in Console', codeKey: 'stored_check', codeLang: 'js' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Paste the marker into a persistent field (comment, username, description, etc.)' },
+          { text: 'Save the data via the form or API' },
+          { text: 'Reload the page' },
+          { text: 'Run the Console check' },
+          { text: '<code>true</code> — stored data renders in raw HTML, investigate the sink', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 9, num: '09',
+    title: 'JSON / API Response',
+    subtitle: 'User-controlled data returned from the server',
+    type: 'stored', typeLabel: 'Stored',
+    sections: [
+      { label: 'Dangerous server response pattern', codeKey: 'json_response', codeLang: 'js' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Open <code>Network → XHR/Fetch</code>' },
+          { text: 'Find requests that return user-controlled data in the response' },
+          { text: 'Check <code>Response</code> tab for the marker <code>STORED_XSS_PROBE_2026</code>' },
+          { text: 'Server returns HTML inside JSON AND frontend inserts it via <code>innerHTML</code> — <strong style="color:var(--danger)">high risk</strong>', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 10, num: '10',
+    title: 'Cookie Injection via Proxy',
+    subtitle: 'XSS through cookie values rendered on the page',
+    type: 'reflected', typeLabel: 'Reflected',
+    sections: [
+      { label: 'Set malicious cookie via Charles / Burp Suite', codeKey: 'cookie_payload', codeLang: 'plain' },
+      { label: 'After page load — check DOM', codeKey: 'cookie_check', codeLang: 'js' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Intercept a request in <code>Charles Proxy</code> or <code>Burp Suite</code>' },
+          { text: 'Modify the cookie header to inject the payload above' },
+          { text: 'Forward the request and let the page load' },
+          { text: 'Run the Console check' },
+          { text: '<code>true</code> — cookie value rendered unescaped into DOM', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 11, num: '11',
+    title: 'CSP Header Check',
+    subtitle: 'Content Security Policy — real protection or illusion?',
+    type: 'defense', typeLabel: 'Defense',
+    sections: [
+      {
+        label: 'How to locate it',
+        rawCode: '// DevTools -> Network -> select main document\n// Response Headers -> look for:\nContent-Security-Policy: ...',
+        codeLang: 'js'
+      },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Any <code>Content Security Policy violation</code> errors in Console?' },
+          { text: 'Is the <code>Content-Security-Policy</code> header present in the main document response?' },
+          { text: 'CSP blocks inline scripts — that is a layer of protection' },
+          { text: 'Warning: XSS via data attributes, nonce bypass, or src can still work even with CSP in place', warn: true },
+        ]
+      }
+    ]
+  },
+  {
+    id: 12, num: '12',
+    title: 'Dangerous Patterns in Source',
+    subtitle: 'DevTools Sources — locate sinks manually',
+    type: 'dom', typeLabel: 'DOM-based',
+    sections: [
+      { label: 'DevTools -> Sources -> Ctrl+Shift+F — search for these patterns', codeKey: 'dangerous_patterns', codeLang: 'plain' },
+      {
+        label: 'Checklist',
+        checks: [
+          { text: 'Search for <code>innerHTML</code> in Sources — inspect every match' },
+          { text: 'Search for <code>insertAdjacentHTML</code>' },
+          { text: 'Search for <code>dangerouslySetInnerHTML</code> (React)' },
+          { text: 'Search for <code>v-html</code> (Vue)' },
+          { text: 'Search for <code>document.write</code>' },
+          { text: 'Search for <code>eval(</code>' },
+          { text: 'Every match is a manual inspection point — trace back whether user data reaches it', warn: true },
+        ]
+      }
+    ]
+  }
+];
+
+const CONFIRM_CHECKS = [
+  'User submits input via field or URL parameter',
+  'Input is saved server-side or reflected in the response',
+  'Input reaches HTML without escaping (raw < > " characters visible in DOM)',
+  'Input flows into a sink: innerHTML / insertAdjacentHTML / document.write / eval',
+  'JavaScript executes in the browser — XSS confirmed',
+];
+
+const WHERE_ITEMS = [
+  'User profile (name, bio, avatar alt)',
+  'Product / article descriptions',
+  'Comment sections',
+  'Rich text / WYSIWYG editors',
+  'Markdown preview',
+  'CSV / Excel import',
+  'Email templates',
+  'Admin panels & dashboards',
+  'Reports and access logs',
+  'Search fields with query display',
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let state = {};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('xss_trainer_en_state');
+    if (saved) state = JSON.parse(saved);
+    else initState();
+  } catch(e) { initState(); }
+}
+
+function initState() {
+  state = { steps: {}, confirms: {} };
+  STEPS.forEach(s => { state.steps[s.id] = { done: false, checks: {} }; });
+  CONFIRM_CHECKS.forEach((_, i) => { state.confirms[i] = false; });
+}
+
+function saveState() {
+  localStorage.setItem('xss_trainer_en_state', JSON.stringify(state));
+}
+
+function resetAll() {
+  if (!confirm('Reset all progress?')) return;
+  initState(); saveState(); location.reload();
+}
+
+// ─────────────────────────────────────────────
+// COPY
+// ─────────────────────────────────────────────
+function copyByKey(btn, key) {
+  const text = CODES[key] || '';
+  doCopy(btn, text);
+}
+
+function copyRaw(btn, encodedText) {
+  try {
+    const bytes = Uint8Array.from(atob(encodedText), c => c.charCodeAt(0));
+    const text = new TextDecoder().decode(bytes);
+    doCopy(btn, text);
+  } catch(e) { doCopy(btn, encodedText); }
+}
+
+function doCopy(btn, text) {
+  const cleanText = text
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(cleanText).catch(() => {});
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = cleanText;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(_) {}
+    ta.remove();
+  }
+  btn.textContent = 'COPIED';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1800);
+}
+
+// ─────────────────────────────────────────────
+// RENDER HELPERS
+// ─────────────────────────────────────────────
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderCodeHighlight(code, lang) {
+  const escaped = escapeHTML(code);
+  if (lang !== 'js') return escaped;
+  return escaped
+    .replace(/(\/\/[^\n]*)/g, '<span class="cm">$1</span>')
+    .replace(/\b(const|let|var|function|return|if|new|this|debugger)\b/g, '<span class="kw">$1</span>')
+    .replace(/&quot;([^&]*)&quot;/g, '<span class="str">&quot;$1&quot;</span>')
+    .replace(/&#39;([^&]*)&#39;/g, "<span class='str'>&#39;$1&#39;</span>");
+}
+
+function buildCodeBlock(rawCode, codeKey, codeLang) {
+  // Use base64 for copy to completely avoid attribute escaping issues
+  const copyData = codeKey
+    ? `data-ckey="${escapeHTML(codeKey)}"`
+    : `data-b64="${btoa(new TextEncoder().encode(rawCode || '').reduce((s, b) => s + String.fromCharCode(b), ''))}"`;
+
+  const display = renderCodeHighlight(rawCode || (codeKey ? CODES[codeKey] : ''), codeLang || 'plain');
+  const onclickAttr = codeKey
+    ? `onclick="copyByKey(this, '${escapeHTML(codeKey)}')"` 
+    : `onclick="copyRaw(this, this.getAttribute('data-b64'))"`;
+
+  return `<div class="code-block">
+  <button class="copy-btn" ${copyData} ${onclickAttr}>COPY</button><span>${display}</span>
+</div>`;
+}
+
+// ─────────────────────────────────────────────
+// BUILD STEPS
+// ─────────────────────────────────────────────
+let globalCheckIdx = 0;
+
+function buildStep(step) {
+  const sState = state.steps[step.id] || { done: false, checks: {} };
+  let sectionsHTML = '';
+
+  step.sections.forEach(sec => {
+    let content = '';
+
+    // Code block
+    if (sec.codeKey || sec.rawCode !== undefined) {
+      const rawCode = sec.rawCode !== undefined ? sec.rawCode : (CODES[sec.codeKey] || '');
+      content += buildCodeBlock(rawCode, sec.codeKey, sec.codeLang);
+    }
+
+    // Checklist
+    if (sec.checks) {
+      let checksHTML = '<div class="checklist" style="margin-top:' + (content ? '12px' : '0') + '">';
+      sec.checks.forEach(ch => {
+        const cid = `${step.id}_${globalCheckIdx}`;
+        const isChecked = sState.checks[cid] || false;
+        checksHTML += `
+          <div class="check-item ${isChecked ? 'checked' : ''} ${ch.warn ? 'warn-check' : ''}"
+               onclick="toggleCheck(${step.id}, '${cid}', this)">
+            <div class="check-box">${isChecked ? '&#10003;' : ''}</div>
+            <div class="check-text">${ch.text}</div>
+            ${ch.warn ? '<div class="check-badge">!! note</div>' : ''}
+          </div>`;
+        globalCheckIdx++;
+      });
+      checksHTML += '</div>';
+      content += checksHTML;
+    }
+
+    // Table
+    if (sec.table) {
+      let t = '<table class="result-table" style="margin-top:' + (content ? '12px' : '0') + '"><thead><tr>';
+      sec.table.headers.forEach(h => { t += `<th>${escapeHTML(h)}</th>`; });
+      t += '</tr></thead><tbody>';
+      sec.table.rows.forEach(row => {
+        t += '<tr>';
+        row.forEach(cell => {
+          if (typeof cell === 'string') t += `<td>${escapeHTML(cell)}</td>`;
+          else t += `<td class="${cell.cls}">${escapeHTML(cell.text)}</td>`;
+        });
+        t += '</tr>';
+      });
+      t += '</tbody></table>';
+      content += t;
+    }
+
+    sectionsHTML += `<div class="step-section"><div class="section-label">${escapeHTML(sec.label)}</div>${content}</div>`;
+  });
+
+  const isDone = sState.done;
+  return `
+    <div class="step-card ${isDone ? 'done-card' : ''}" id="step_${step.id}">
+      <div class="step-header" onclick="toggleStep(${step.id})">
+        <div class="step-num-badge">${step.num}</div>
+        <div class="step-title-group">
+          <div class="step-title">${escapeHTML(step.title)}</div>
+          <div class="step-subtitle">${escapeHTML(step.subtitle)}</div>
+        </div>
+        <div class="step-type-tag tag-${step.type}">${escapeHTML(step.typeLabel)}</div>
+        <div class="step-chevron">&#9658;</div>
+      </div>
+      <div class="step-body">
+        ${sectionsHTML}
+        <button class="complete-btn ${isDone ? 'is-done' : ''}" onclick="toggleStepDone(event, ${step.id})">
+          <span class="btn-icon">${isDone ? '&#10003;' : '&#9675;'}</span>
+          &nbsp;${isDone ? 'Step complete &mdash; click to undo' : 'Mark step as complete'}
+        </button>
+      </div>
+    </div>`;
+}
+
+function buildConfirmSection() {
+  let checksHTML = '<div class="checklist">';
+  CONFIRM_CHECKS.forEach((text, i) => {
+    const isChecked = state.confirms[i] || false;
+    checksHTML += `
+      <div class="check-item ${isChecked ? 'checked' : ''}" onclick="toggleConfirm(${i}, this)">
+        <div class="check-box">${isChecked ? '&#10003;' : ''}</div>
+        <div class="check-text">${escapeHTML(text)}</div>
+      </div>`;
+  });
+  checksHTML += '</div>';
+
+  const whereItems = WHERE_ITEMS.map(w => `
+    <div class="where-item"><div class="where-dot"></div>${escapeHTML(w)}</div>`).join('');
+
+  // Final payload code block — uses CODES registry, no inline JSON.stringify
+  const finalCodeBlock = buildCodeBlock(CODES.final_payload, 'final_payload', 'js');
+
+  return `
+    <div class="report-card" id="step_final">
+      <div class="report-title">XSS CONFIRMATION</div>
+
+      <div class="callout callout-green">
+        XSS is confirmed when the entire chain below is completed
+      </div>
+
+      ${checksHTML}
+
+      <div style="margin-top:20px;">
+        <div class="section-label">Final test payload &mdash; use instead of alert(1), reveals context</div>
+        ${finalCodeBlock}
+      </div>
+
+      <div style="margin-top:24px;">
+        <div class="section-label">Where XSS commonly lives</div>
+        <div class="callout callout-warn" style="margin-top:8px;margin-bottom:12px;">
+          Do NOT look in /login &mdash; look where users can enter arbitrary freeform data
+        </div>
+        <div class="where-grid">${whereItems}</div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <div class="section-label">Checklist coverage by type</div>
+        <div class="coverage-grid" style="margin-top:8px;">
+          <div class="cov-cell"><div class="cov-num" id="covReflected">0</div><div class="cov-label">Reflected</div></div>
+          <div class="cov-cell"><div class="cov-num" id="covStored">0</div><div class="cov-label">Stored</div></div>
+          <div class="cov-cell"><div class="cov-num" id="covDOM">0</div><div class="cov-label">DOM-based</div></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────
+// INTERACTIONS
+// ─────────────────────────────────────────────
+function toggleStep(id) {
+  document.getElementById('step_' + id).classList.toggle('open');
+  updateNav();
+}
+
+function toggleCheck(stepId, cid, el) {
+  if (!state.steps[stepId]) state.steps[stepId] = { done: false, checks: {} };
+  state.steps[stepId].checks[cid] = !state.steps[stepId].checks[cid];
+  const checked = state.steps[stepId].checks[cid];
+  el.classList.toggle('checked', checked);
+  el.querySelector('.check-box').innerHTML = checked ? '&#10003;' : '';
+  saveState(); updateProgress();
+}
+
+function toggleConfirm(i, el) {
+  state.confirms[i] = !state.confirms[i];
+  el.classList.toggle('checked', state.confirms[i]);
+  el.querySelector('.check-box').innerHTML = state.confirms[i] ? '&#10003;' : '';
+  saveState(); updateProgress();
+}
+
+function toggleStepDone(e, id) {
+  e.stopPropagation();
+  if (!state.steps[id]) state.steps[id] = { done: false, checks: {} };
+  state.steps[id].done = !state.steps[id].done;
+  saveState();
+  const card = document.getElementById('step_' + id);
+  const isDone = state.steps[id].done;
+  card.classList.toggle('done-card', isDone);
+  const btn = card.querySelector('.complete-btn');
+  btn.classList.toggle('is-done', isDone);
+  btn.querySelector('.btn-icon').innerHTML = isDone ? '&#10003;' : '&#9675;';
+  const textNode = btn.lastChild;
+  textNode.textContent = isDone ? ' Step complete \u2014 click to undo' : ' Mark step as complete';
+  card.querySelector('.step-num-badge').style.color = isDone ? 'var(--accent)' : '';
+  updateProgress(); updateNav(); updateCoverage();
+}
+
+// ─────────────────────────────────────────────
+// PROGRESS
+// ─────────────────────────────────────────────
+function countDone() {
+  return STEPS.filter(s => state.steps[s.id] && state.steps[s.id].done).length;
+}
+
+function updateProgress() {
+  const done = countDone(), total = STEPS.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressDesc').textContent = 'steps done: ' + done + ' / ' + total;
+  document.getElementById('ringLabel').textContent = done;
+  const offset = 138.2 - (pct / 100) * 138.2;
+  document.getElementById('ringFill').style.strokeDashoffset = offset;
+}
+
+function updateCoverage() {
+  const types = { reflected: 0, stored: 0, dom: 0 };
+  STEPS.forEach(s => {
+    if (state.steps[s.id] && state.steps[s.id].done && types[s.type] !== undefined) types[s.type]++;
+  });
+  const r = document.getElementById('covReflected');
+  const s = document.getElementById('covStored');
+  const d = document.getElementById('covDOM');
+  if (r) r.textContent = types.reflected;
+  if (s) s.textContent = types.stored;
+  if (d) d.textContent = types.dom;
+}
+
+// ─────────────────────────────────────────────
+// NAV
+// ─────────────────────────────────────────────
+function buildNav() {
+  const nav = document.getElementById('sideNav');
+  let html = '';
+  STEPS.forEach(step => {
+    const isDone = state.steps[step.id] && state.steps[step.id].done;
+    html += `<div class="nav-item ${isDone ? 'done' : ''}" id="nav_${step.id}" onclick="scrollToStep(${step.id})">
+      <span class="nav-num">${step.num}</span>
+      <div class="nav-check">${isDone ? '&#10003;' : ''}</div>
+      <span class="nav-title">${step.title}</span>
+    </div>`;
+  });
+  html += `<div class="nav-item" onclick="scrollToStep('final')">
+    <span class="nav-num">--</span>
+    <div class="nav-check"></div>
+    <span class="nav-title">Confirmation</span>
+  </div>`;
+  nav.innerHTML = html;
+}
+
+function updateNav() {
+  STEPS.forEach(step => {
+    const el = document.getElementById('nav_' + step.id);
+    if (!el) return;
+    const isDone = state.steps[step.id] && state.steps[step.id].done;
+    el.classList.toggle('done', isDone);
+    el.querySelector('.nav-check').innerHTML = isDone ? '&#10003;' : '';
+  });
+}
+
+function scrollToStep(id) {
+  const el = document.getElementById('step_' + id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (!el.classList.contains('open')) el.classList.add('open');
+  el.classList.add('highlight');
+  setTimeout(() => el.classList.remove('highlight'), 1200);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+function init() {
+  loadState();
+  globalCheckIdx = 0;
+
+  let html = '';
+  STEPS.forEach(step => { html += buildStep(step); });
+  html += buildConfirmSection();
+  document.getElementById('stepsContainer').innerHTML = html;
+
+  buildNav();
+  updateProgress();
+  updateCoverage();
+
+  // Open first step by default
+  const first = document.getElementById('step_0');
+  if (first) first.classList.add('open');
+}
+
+init();
+</script>
+</body>
+</html>
