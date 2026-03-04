@@ -1,14 +1,13 @@
 <div align="center">
 
+![XSS Trainer Banner](assets/banner.svg)
+
 <img src="https://img.shields.io/badge/XSS-Trainer-00ff88?style=for-the-badge&logo=hackthebox&logoColor=white" alt="XSS Trainer"/>
-
 <br/>
 <br/>
-
 <img src="https://img.shields.io/badge/Security-Checklist-0d1017?style=for-the-badge&logo=owasp&logoColor=4af0a0" alt="Security Checklist"/>
 <img src="https://img.shields.io/badge/Interactive-Trainer-0d1017?style=for-the-badge&logo=codepen&logoColor=4a9ef0" alt="Interactive Trainer"/>
 <img src="https://img.shields.io/badge/No_Dependencies-Pure_HTML-0d1017?style=for-the-badge&logo=html5&logoColor=f07070" alt="Pure HTML"/>
-
 </div>
 
 ---
@@ -67,11 +66,9 @@ Source → Transport → Storage → Render → Execution
 ### 📦 Usage
 
 **Option A** — use the hosted version:
-
 👉 [**red4beard.github.io/xss-trainer**](https://red4beard.github.io/xss-trainer/)
 
 **Option B** — run locally:
-
 ```bash
 git clone https://github.com/Red4beard/xss-trainer.git
 open xss-trainer/index.html
@@ -84,12 +81,10 @@ No server needed. Just open the HTML file in any browser.
 ### 🛠️ Built with
 
 <div align="center">
-
 <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" alt="HTML5"/>
 <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white" alt="CSS3"/>
 <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript"/>
 <img src="https://img.shields.io/badge/IBM_Plex_Mono-052FAD?style=flat-square&logo=ibm&logoColor=white" alt="IBM Plex"/>
-
 </div>
 
 ---
