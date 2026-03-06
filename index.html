@@ -8,12 +8,12 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
 
 :root {
-  --bg: #07090d;
-  --bg2: #0d1017;
-  --surface: #111520;
-  --surface2: #161b28;
-  --border: #1c2333;
-  --border2: #232d42;
+  --bg: #0e1118;
+  --bg2: #131720;
+  --surface: #171c2a;
+  --surface2: #1c2235;
+  --border: #222840;
+  --border2: #2a3350;
   --accent: #4af0a0;
   --accent-dim: rgba(74,240,160,0.08);
   --warn: #f0a04a;
@@ -22,8 +22,8 @@
   --danger-dim: rgba(240,74,106,0.08);
   --blue: #4a9ef0;
   --blue-dim: rgba(74,158,240,0.08);
-  --text: #b8c8e0;
-  --text2: #6a7a90;
+  --text: #c2d4e8;
+  --text2: #7a8aa0;
   --text3: #3a4558;
   --mono: 'IBM Plex Mono', monospace;
   --sans: 'IBM Plex Sans', sans-serif;
@@ -47,14 +47,12 @@ body::before {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: repeating-linear-gradient(
     0deg, transparent, transparent 2px,
-    rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+    rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
   );
 }
 
-/* ── Layout ── */
 .app { position: relative; z-index: 1; display: flex; min-height: 100vh; }
 
-/* ── Sidebar ── */
 .sidebar {
   width: 280px; flex-shrink: 0;
   background: var(--bg2);
@@ -71,7 +69,6 @@ body::before {
 .logo-big span { color: var(--accent); }
 .logo-sub { font-family: var(--mono); font-size: 10px; color: var(--text2); margin-top: 6px; letter-spacing: 1px; text-transform: uppercase; }
 
-/* Progress ring */
 .progress-wrap {
   padding: 20px; display: flex; align-items: center; gap: 14px;
   border-bottom: 1px solid var(--border);
@@ -92,7 +89,6 @@ body::before {
 .progress-pct { font-family: var(--display); font-size: 28px; color: var(--accent); line-height: 1; }
 .progress-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
 
-/* Nav */
 .nav { padding: 10px 0; flex: 1; }
 .nav-item {
   display: flex; align-items: center; gap: 10px;
@@ -117,10 +113,8 @@ body::before {
   font-size: 10px; color: var(--text3); font-family: var(--mono);
 }
 
-/* ── Main ── */
 .main { flex: 1; padding: 40px 48px 80px; max-width: 860px; }
 
-/* Chain banner */
 .chain-banner {
   background: var(--surface); border: 1px solid var(--border);
   border-left: 3px solid var(--blue);
@@ -131,7 +125,6 @@ body::before {
 .chain-banner .chain-item { color: var(--blue); }
 .chain-banner .chain-arr { color: var(--text3); }
 
-/* Step card */
 .step-card {
   margin-bottom: 24px; border: 1px solid var(--border);
   background: var(--surface); position: relative;
@@ -165,7 +158,6 @@ body::before {
 .step-chevron { font-size: 11px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
 .step-card.open .step-chevron { transform: rotate(90deg); }
 
-/* Step body */
 .step-body { display: none; }
 .step-card.open .step-body { display: block; }
 
@@ -177,9 +169,8 @@ body::before {
   letter-spacing: 1px; color: var(--text3); margin-bottom: 10px;
 }
 
-/* Code block */
 .code-block {
-  background: #080b10; border: 1px solid var(--border);
+  background: #090c12; border: 1px solid var(--border);
   padding: 12px 14px 12px 14px;
   font-family: var(--mono); font-size: 12px; color: #c0d8f0;
   position: relative; overflow-x: auto; line-height: 1.7; white-space: pre;
@@ -204,7 +195,6 @@ code {
   padding: 1px 5px; border: 1px solid var(--border);
 }
 
-/* Table */
 .result-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--mono); }
 .result-table th {
   background: var(--surface2); padding: 8px 12px; text-align: left;
@@ -218,7 +208,6 @@ code {
 .td-danger { color: var(--danger); }
 .td-danger::before { content: '! '; }
 
-/* Checklist */
 .checklist { display: flex; flex-direction: column; gap: 8px; }
 .check-item {
   display: flex; align-items: flex-start; gap: 12px;
@@ -246,7 +235,6 @@ code {
   color: var(--danger); flex-shrink: 0; margin-top: 2px; align-self: flex-start;
 }
 
-/* Callout */
 .callout {
   padding: 12px 14px; border-left: 2px solid;
   font-size: 12px; line-height: 1.7; font-family: var(--mono); margin-bottom: 12px;
@@ -256,7 +244,6 @@ code {
 .callout-danger { border-color: var(--danger); background: var(--danger-dim); color: var(--danger); }
 .callout-green { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
 
-/* Complete button */
 .complete-btn {
   display: flex; align-items: center; gap: 8px; width: 100%;
   padding: 12px 20px; background: transparent; border: none;
@@ -269,7 +256,6 @@ code {
 .complete-btn.is-done { background: var(--accent-dim); color: var(--accent); }
 .complete-btn .btn-icon { font-size: 13px; }
 
-/* Report card */
 .report-card { background: var(--surface); border: 1px solid var(--border); padding: 28px; margin-top: 16px; }
 .report-title { font-family: var(--display); font-size: 28px; letter-spacing: 2px; color: var(--text); margin-bottom: 20px; }
 
@@ -293,17 +279,68 @@ code {
 }
 .reset-btn:hover { border-color: var(--danger); color: var(--danger); }
 
-/* Scrollbar */
+/* ── Resources section ── */
+.resources-card {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 28px; margin-top: 24px;
+}
+.resources-title {
+  font-family: var(--display); font-size: 28px; letter-spacing: 2px;
+  color: var(--text); margin-bottom: 6px;
+}
+.resources-sub {
+  font-family: var(--mono); font-size: 11px; color: var(--text2);
+  margin-bottom: 24px;
+}
+.resources-group { margin-bottom: 20px; }
+.resources-group-label {
+  font-family: var(--display); font-size: 13px; letter-spacing: 2px;
+  color: var(--text); margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.resource-link {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 12px; margin-bottom: 6px;
+  background: var(--surface2); border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.resource-link:hover { border-color: var(--accent); background: var(--accent-dim); }
+.resource-icon {
+  font-size: 14px; flex-shrink: 0; margin-top: 1px;
+  width: 20px; text-align: center;
+}
+.resource-body {}
+.resource-name {
+  font-family: var(--mono); font-size: 12px; color: var(--accent);
+  font-weight: 600; display: block; margin-bottom: 2px;
+}
+.resource-desc {
+  font-size: 11px; color: var(--text2); line-height: 1.4;
+}
+.resource-url {
+  font-family: var(--mono); font-size: 9px; color: var(--text3);
+  margin-top: 3px; display: block;
+}
+
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
 ::-webkit-scrollbar-thumb { background: var(--border2); }
 
-/* Highlight animation */
 @keyframes highlightPulse {
   0% { border-color: var(--accent); }
   100% { border-color: var(--border); }
 }
 .step-card.highlight { animation: highlightPulse 1s ease forwards; }
+
+/* Probe marker explanation box */
+.marker-explain {
+  background: rgba(74,158,240,0.05); border: 1px solid rgba(74,158,240,0.2);
+  border-left: 3px solid var(--blue);
+  padding: 12px 14px; margin-bottom: 12px;
+  font-family: var(--mono); font-size: 11px; color: var(--text2); line-height: 1.7;
+}
+.marker-explain strong { color: var(--blue); }
 
 @media (max-width: 900px) {
   .sidebar { display: none; }
@@ -314,7 +351,6 @@ code {
 <body>
 <div class="app">
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-header">
     <div class="logo-big">XSS<span>.</span></div>
@@ -342,7 +378,6 @@ code {
   </div>
 </aside>
 
-<!-- MAIN -->
 <main class="main" id="mainContent">
 
   <div class="chain-banner">
@@ -365,16 +400,12 @@ code {
 </div>
 
 <script>
-// ─────────────────────────────────────────────
-// CODE SNIPPETS REGISTRY
-// All multi-line or special-character code lives here.
-// Buttons reference them by key — avoids JSON.stringify escaping bugs.
-// ─────────────────────────────────────────────
 const CODES = {
-  probe_url:        'https://site.com/page?test=XSS_PROBE_2026_A1',
-  probe_check:      'document.body.innerHTML.includes("XSS_PROBE_2026_A1")',
+  probe_marker:     'XSS_TEST_MARKER',
+  probe_url:        'https://site.com/page?q=XSS_TEST_MARKER',
+  probe_check:      'document.body.innerHTML.includes("XSS_TEST_MARKER")',
   chars_expected:   '&lt;  &gt;  &quot;  &#39;  &amp;',
-  attr_break:       'ATTR_TEST_2026 " test=\'x',
+  attr_break:       'ATTR_TEST " test=\'x',
   dom_hook:
 `(function() {
   const original = Object.getOwnPropertyDescriptor(
@@ -390,7 +421,7 @@ const CODES = {
     }
   });
 })();`,
-  dom_marker:       'XSS_DOM_PROBE_2026',
+  dom_marker:       'XSS_TEST_MARKER',
   adj_hook:
 `const _origAdj = Element.prototype.insertAdjacentHTML;
 Element.prototype.insertAdjacentHTML = function(pos, html) {
@@ -403,17 +434,17 @@ Element.prototype.insertAdjacentHTML = function(pos, html) {
   url_check:
 `window.location.search
 window.location.hash`,
-  url_hash:         'https://site.com/page#XSS_HASH_2026',
-  url_hash_check:   'document.body.innerHTML.includes("XSS_HASH_2026")',
+  url_hash:         'https://site.com/page#XSS_TEST_MARKER',
+  url_hash_check:   'document.body.innerHTML.includes("XSS_TEST_MARKER")',
   ls_keys:          'Object.keys(localStorage)',
   ls_inject:
-`localStorage.setItem("XSS_TEST_KEY", "<div>XSS_LS_PROBE</div>");
+`localStorage.setItem("XSS_TEST_KEY", "<div>XSS_TEST_MARKER</div>");
 location.reload();`,
-  ls_check:         'document.body.innerHTML.includes("XSS_LS_PROBE")',
-  stored_check:     'document.body.innerHTML.includes("STORED_XSS_PROBE_2026")',
-  json_response:    '{ "content": "<div>STORED_XSS_PROBE_2026</div>" }',
-  cookie_payload:   'XSS_COOKIE_TEST=<div>XSS_COOKIE_2026</div>',
-  cookie_check:     'document.body.innerHTML.includes("XSS_COOKIE_2026")',
+  ls_check:         'document.body.innerHTML.includes("XSS_TEST_MARKER")',
+  stored_check:     'document.body.innerHTML.includes("XSS_TEST_MARKER")',
+  json_response:    '{ "content": "<div>XSS_TEST_MARKER</div>" }',
+  cookie_payload:   'XSS_TEST_COOKIE=<div>XSS_TEST_MARKER</div>',
+  cookie_check:     'document.body.innerHTML.includes("XSS_TEST_MARKER")',
   dangerous_patterns:
 `innerHTML
 insertAdjacentHTML
@@ -429,9 +460,6 @@ alert(document.domain)
 console.log("XSS:", document.domain, document.cookie)`,
 };
 
-// ─────────────────────────────────────────────
-// STEP DATA
-// ─────────────────────────────────────────────
 const STEPS = [
   {
     id: 0, num: '00',
@@ -455,17 +483,17 @@ const STEPS = [
     title: 'Reflection Marker Test',
     subtitle: 'Does the input come back in the response?',
     type: 'reflected', typeLabel: 'Reflected',
+    markerExplain: true,
     sections: [
-      { label: 'Input marker (paste into field or URL param)', codeKey: 'probe_url', codeLang: 'plain',
-        codeDisplay: 'XSS_PROBE_2026_A1' },
+      { label: 'Probe marker — paste into any field or URL param', codeKey: 'probe_marker', codeLang: 'plain' },
       { label: 'Test via URL parameter', codeKey: 'probe_url', codeLang: 'plain' },
       { label: 'Check in Console', codeKey: 'probe_check', codeLang: 'js' },
       {
         label: 'Checklist',
         checks: [
-          { text: 'Type <code>XSS_PROBE_2026_A1</code> into the target input field' },
+          { text: 'Type <code>XSS_TEST_MARKER</code> into the target input field' },
           { text: 'Run the Console check above — note the result (<code>true</code> / <code>false</code>)' },
-          { text: 'In <code>Elements</code> (Ctrl+F) search for <code>XSS_PROBE_2026_A1</code>' },
+          { text: 'In <code>Elements</code> (Ctrl+F) search for <code>XSS_TEST_MARKER</code>' },
         ]
       },
       {
@@ -531,7 +559,7 @@ const STEPS = [
         label: 'Checklist',
         checks: [
           { text: 'Paste the hook snippet into Console and press Enter' },
-          { text: 'Type the marker <code>XSS_DOM_PROBE_2026</code> into the input' },
+          { text: 'Type the marker <code>XSS_TEST_MARKER</code> into the input' },
           { text: '<code>debugger</code> fired and <code>value</code> contains the marker — <strong style="color:var(--danger)">real DOM-XSS risk</strong>', warn: true },
           { text: '<code>innerHTML</code> called but no marker — safe framework usage, not dangerous' },
         ]
@@ -549,7 +577,7 @@ const STEPS = [
         label: 'Checklist',
         checks: [
           { text: 'Paste the hook snippet into Console and press Enter' },
-          { text: 'Re-submit the marker <code>XSS_DOM_PROBE_2026</code>' },
+          { text: 'Re-submit the marker <code>XSS_TEST_MARKER</code>' },
           { text: '<code>debugger</code> fired — user data flows into <code>insertAdjacentHTML</code>', warn: true },
         ]
       }
@@ -567,8 +595,8 @@ const STEPS = [
       {
         label: 'Checklist',
         checks: [
-          { text: 'Run <code>window.location.search</code> and <code>window.location.hash</code> in Console — note values' },
-          { text: 'Navigate to the test URL with <code>#XSS_HASH_2026</code>' },
+          { text: 'Run <code>window.location.search</code> and <code>window.location.hash</code> in Console' },
+          { text: 'Navigate to the test URL with <code>#XSS_TEST_MARKER</code>' },
           { text: 'Run the DOM check in Console' },
           { text: 'Result <code>true</code> — hash reaches DOM, investigate the sink', warn: true },
         ]
@@ -603,7 +631,7 @@ const STEPS = [
     type: 'stored', typeLabel: 'Stored',
     sections: [
       { label: 'Input to save (use in a form field — comment, name, bio...)',
-        codeKey: null, rawCode: 'STORED_XSS_PROBE_2026', codeLang: 'plain' },
+        codeKey: null, rawCode: 'XSS_TEST_MARKER', codeLang: 'plain' },
       { label: 'After page reload — verify in Console', codeKey: 'stored_check', codeLang: 'js' },
       {
         label: 'Checklist',
@@ -629,7 +657,7 @@ const STEPS = [
         checks: [
           { text: 'Open <code>Network → XHR/Fetch</code>' },
           { text: 'Find requests that return user-controlled data in the response' },
-          { text: 'Check <code>Response</code> tab for the marker <code>STORED_XSS_PROBE_2026</code>' },
+          { text: 'Check <code>Response</code> tab for the marker <code>XSS_TEST_MARKER</code>' },
           { text: 'Server returns HTML inside JSON AND frontend inserts it via <code>innerHTML</code> — <strong style="color:var(--danger)">high risk</strong>', warn: true },
         ]
       }
@@ -721,9 +749,59 @@ const WHERE_ITEMS = [
   'Search fields with query display',
 ];
 
-// ─────────────────────────────────────────────
-// STATE
-// ─────────────────────────────────────────────
+const RESOURCES = [
+  {
+    group: 'OWASP — Official Standards',
+    items: [
+      {
+        icon: '🛡️',
+        name: 'XSS Prevention Cheat Sheet',
+        desc: 'Complete reference for preventing XSS — encoding rules, CSP, framework-specific mitigations.',
+        url: 'https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html',
+        urlShort: 'cheatsheetseries.owasp.org',
+      },
+      {
+        icon: '📋',
+        name: 'OWASP Testing Guide — XSS',
+        desc: 'Methodology for testing XSS vulnerabilities in web applications during security assessments.',
+        url: 'https://owasp.org/www-project-web-security-testing-guide/',
+        urlShort: 'owasp.org/www-project-web-security-testing-guide',
+      },
+    ]
+  },
+  {
+    group: 'Practice & Labs',
+    items: [
+      {
+        icon: '🎓',
+        name: 'PortSwigger Web Security Academy',
+        desc: 'Best free interactive XSS course — 30+ labs covering Reflected, Stored, DOM-based, and filter bypass.',
+        url: 'https://portswigger.net/web-security/cross-site-scripting',
+        urlShort: 'portswigger.net/web-security/cross-site-scripting',
+      },
+      {
+        icon: '🎮',
+        name: 'XSS Game by Google',
+        desc: '6 progressive XSS levels in a sandboxed environment — great for beginners and QA engineers.',
+        url: 'https://xss-game.appspot.com/level1',
+        urlShort: 'xss-game.appspot.com',
+      },
+    ]
+  },
+  {
+    group: 'Payload Reference',
+    items: [
+      {
+        icon: '📦',
+        name: 'PayloadsAllTheThings — XSS',
+        desc: 'Extensive collection of XSS payloads, filter bypasses, and polyglots. Essential reference.',
+        url: 'https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XSS%20Injection',
+        urlShort: 'github.com / PayloadsAllTheThings / XSS Injection',
+      },
+    ]
+  },
+];
+
 let state = {};
 
 function loadState() {
@@ -749,9 +827,6 @@ function resetAll() {
   initState(); saveState(); location.reload();
 }
 
-// ─────────────────────────────────────────────
-// COPY
-// ─────────────────────────────────────────────
 function copyByKey(btn, key) {
   const text = CODES[key] || '';
   doCopy(btn, text);
@@ -773,21 +848,15 @@ function doCopy(btn, text) {
     navigator.clipboard.writeText(cleanText).catch(() => {});
   } else {
     const ta = document.createElement('textarea');
-    ta.value = cleanText;
-    ta.style.cssText = 'position:fixed;opacity:0';
-    document.body.appendChild(ta);
-    ta.select();
+    ta.value = cleanText; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
     try { document.execCommand('copy'); } catch(_) {}
     ta.remove();
   }
-  btn.textContent = 'COPIED';
-  btn.classList.add('copied');
+  btn.textContent = 'COPIED'; btn.classList.add('copied');
   setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 1800);
 }
 
-// ─────────────────────────────────────────────
-// RENDER HELPERS
-// ─────────────────────────────────────────────
 function escapeHTML(str) {
   return String(str)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
@@ -805,40 +874,42 @@ function renderCodeHighlight(code, lang) {
 }
 
 function buildCodeBlock(rawCode, codeKey, codeLang) {
-  // Use base64 for copy to completely avoid attribute escaping issues
   const copyData = codeKey
     ? `data-ckey="${escapeHTML(codeKey)}"`
     : `data-b64="${btoa(new TextEncoder().encode(rawCode || '').reduce((s, b) => s + String.fromCharCode(b), ''))}"`;
-
   const display = renderCodeHighlight(rawCode || (codeKey ? CODES[codeKey] : ''), codeLang || 'plain');
   const onclickAttr = codeKey
     ? `onclick="copyByKey(this, '${escapeHTML(codeKey)}')"` 
     : `onclick="copyRaw(this, this.getAttribute('data-b64'))"`;
-
   return `<div class="code-block">
   <button class="copy-btn" ${copyData} ${onclickAttr}>COPY</button><span>${display}</span>
 </div>`;
 }
 
-// ─────────────────────────────────────────────
-// BUILD STEPS
-// ─────────────────────────────────────────────
 let globalCheckIdx = 0;
 
 function buildStep(step) {
   const sState = state.steps[step.id] || { done: false, checks: {} };
   let sectionsHTML = '';
 
-  step.sections.forEach(sec => {
+  step.sections.forEach((sec, secIdx) => {
     let content = '';
 
-    // Code block
+    // Marker explanation — only on step 01, first section
+    if (step.markerExplain && secIdx === 0) {
+      content += `<div class="marker-explain">
+  <strong>What is XSS_TEST_MARKER?</strong><br>
+  A unique plaintext string with no special HTML characters — safe to inject anywhere without breaking the page or triggering WAF rules.<br>
+  Use it to detect whether your input is <em>reflected</em>, <em>stored</em>, or flows into the DOM before attempting any real payloads.<br>
+  You can replace it with any unique string that doesn't appear in the target page naturally.
+</div>`;
+    }
+
     if (sec.codeKey || sec.rawCode !== undefined) {
       const rawCode = sec.rawCode !== undefined ? sec.rawCode : (CODES[sec.codeKey] || '');
       content += buildCodeBlock(rawCode, sec.codeKey, sec.codeLang);
     }
 
-    // Checklist
     if (sec.checks) {
       let checksHTML = '<div class="checklist" style="margin-top:' + (content ? '12px' : '0') + '">';
       sec.checks.forEach(ch => {
@@ -857,7 +928,6 @@ function buildStep(step) {
       content += checksHTML;
     }
 
-    // Table
     if (sec.table) {
       let t = '<table class="result-table" style="margin-top:' + (content ? '12px' : '0') + '"><thead><tr>';
       sec.table.headers.forEach(h => { t += `<th>${escapeHTML(h)}</th>`; });
@@ -913,25 +983,17 @@ function buildConfirmSection() {
 
   const whereItems = WHERE_ITEMS.map(w => `
     <div class="where-item"><div class="where-dot"></div>${escapeHTML(w)}</div>`).join('');
-
-  // Final payload code block — uses CODES registry, no inline JSON.stringify
   const finalCodeBlock = buildCodeBlock(CODES.final_payload, 'final_payload', 'js');
 
   return `
     <div class="report-card" id="step_final">
       <div class="report-title">XSS CONFIRMATION</div>
-
-      <div class="callout callout-green">
-        XSS is confirmed when the entire chain below is completed
-      </div>
-
+      <div class="callout callout-green">XSS is confirmed when the entire chain below is completed</div>
       ${checksHTML}
-
       <div style="margin-top:20px;">
-        <div class="section-label">Final test payload &mdash; use instead of alert(1), reveals context</div>
+        <div class="section-label">Final test payload &mdash; reveals execution context</div>
         ${finalCodeBlock}
       </div>
-
       <div style="margin-top:24px;">
         <div class="section-label">Where XSS commonly lives</div>
         <div class="callout callout-warn" style="margin-top:8px;margin-bottom:12px;">
@@ -939,7 +1001,6 @@ function buildConfirmSection() {
         </div>
         <div class="where-grid">${whereItems}</div>
       </div>
-
       <div style="margin-top:24px;">
         <div class="section-label">Checklist coverage by type</div>
         <div class="coverage-grid" style="margin-top:8px;">
@@ -951,9 +1012,36 @@ function buildConfirmSection() {
     </div>`;
 }
 
-// ─────────────────────────────────────────────
-// INTERACTIONS
-// ─────────────────────────────────────────────
+function buildResourcesSection() {
+  let groupsHTML = '';
+  RESOURCES.forEach(group => {
+    let itemsHTML = '';
+    group.items.forEach(item => {
+      itemsHTML += `
+        <a class="resource-link" href="${item.url}" target="_blank" rel="noopener noreferrer">
+          <div class="resource-icon">${item.icon}</div>
+          <div class="resource-body">
+            <span class="resource-name">${escapeHTML(item.name)}</span>
+            <span class="resource-desc">${escapeHTML(item.desc)}</span>
+            <span class="resource-url">${escapeHTML(item.urlShort)}</span>
+          </div>
+        </a>`;
+    });
+    groupsHTML += `
+      <div class="resources-group">
+        <div class="resources-group-label">${escapeHTML(group.group)}</div>
+        ${itemsHTML}
+      </div>`;
+  });
+
+  return `
+    <div class="resources-card" id="step_resources">
+      <div class="resources-title">RESOURCES</div>
+      <div class="resources-sub">// curated links for deeper XSS knowledge</div>
+      ${groupsHTML}
+    </div>`;
+}
+
 function toggleStep(id) {
   document.getElementById('step_' + id).classList.toggle('open');
   updateNav();
@@ -992,9 +1080,6 @@ function toggleStepDone(e, id) {
   updateProgress(); updateNav(); updateCoverage();
 }
 
-// ─────────────────────────────────────────────
-// PROGRESS
-// ─────────────────────────────────────────────
 function countDone() {
   return STEPS.filter(s => state.steps[s.id] && state.steps[s.id].done).length;
 }
@@ -1022,9 +1107,6 @@ function updateCoverage() {
   if (d) d.textContent = types.dom;
 }
 
-// ─────────────────────────────────────────────
-// NAV
-// ─────────────────────────────────────────────
 function buildNav() {
   const nav = document.getElementById('sideNav');
   let html = '';
@@ -1040,6 +1122,11 @@ function buildNav() {
     <span class="nav-num">--</span>
     <div class="nav-check"></div>
     <span class="nav-title">Confirmation</span>
+  </div>`;
+  html += `<div class="nav-item" onclick="scrollToStep('resources')">
+    <span class="nav-num">📚</span>
+    <div class="nav-check"></div>
+    <span class="nav-title">Resources</span>
   </div>`;
   nav.innerHTML = html;
 }
@@ -1058,28 +1145,24 @@ function scrollToStep(id) {
   const el = document.getElementById('step_' + id);
   if (!el) return;
   el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  if (!el.classList.contains('open')) el.classList.add('open');
-  el.classList.add('highlight');
-  setTimeout(() => el.classList.remove('highlight'), 1200);
+  if (el.classList.contains('step-card') && !el.classList.contains('open')) el.classList.add('open');
+  if (el.classList.contains('step-card')) {
+    el.classList.add('highlight');
+    setTimeout(() => el.classList.remove('highlight'), 1200);
+  }
 }
 
-// ─────────────────────────────────────────────
-// INIT
-// ─────────────────────────────────────────────
 function init() {
   loadState();
   globalCheckIdx = 0;
-
   let html = '';
   STEPS.forEach(step => { html += buildStep(step); });
   html += buildConfirmSection();
+  html += buildResourcesSection();
   document.getElementById('stepsContainer').innerHTML = html;
-
   buildNav();
   updateProgress();
   updateCoverage();
-
-  // Open first step by default
   const first = document.getElementById('step_0');
   if (first) first.classList.add('open');
 }
